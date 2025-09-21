@@ -5,6 +5,7 @@ import LightRays from "@/components/LightRays";
 
 export default function SignInPage() {
   return (
+    
     <main className="relative w-screen h-screen bg-[radial-gradient(circle_at_50%,_#7F170E_0%,_#7F170E_10%,_#3F0B06_70%,_#000000_130%)]">
       <div className="absolute inset-0 w-full h-full">
         <LightRays
@@ -23,6 +24,7 @@ export default function SignInPage() {
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <SignInCard />
       </div>
+      
     </main>
   );
 }

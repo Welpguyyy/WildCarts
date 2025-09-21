@@ -9,6 +9,13 @@ import { FaLock } from "react-icons/fa6";
 
 export default function SignUpCard() {
   const [gender, setGender] = useState("");
+  const [username, setUsername] = useState("");
+  const [schoolID, setSchoolID] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+
 
   return (
     <div className="animate-fadeIn card-glow relative w-full max-w-sm md:max-w-md lg:max-w-lg bg-[#F9F3CF] rounded-2xl shadow p-6">
@@ -34,6 +41,7 @@ export default function SignUpCard() {
             className="inner-shadow inner-shadow2 w-full p-3 pl-13 rounded-2xl placeholder:font-medium placeholder:text-[#7F7F7F] focus:outline-none"
           />
         </div>
+      
 
         {/* School ID + Gender Dropdown */}
         <div className="pt-5 w-full max-w-[420px] flex flex-wrap items-center gap-3">
