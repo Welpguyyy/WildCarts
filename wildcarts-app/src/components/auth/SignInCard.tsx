@@ -4,9 +4,38 @@ import Link from "next/link";
 import { FaUser } from "react-icons/fa";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FaLock } from "react-icons/fa6";
+import supadata from "@/lib/supabaseclient";
+import { useRouter } from "next/navigation";
 
 export default function SignInCard() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");  // 👈 use email here
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const router = useRouter();
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setError(null);
+
+    const { data, error } = await supadata.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      console.error("Sign-in error:", error.message);
+    } else {
+      setSuccessMsg("Sign-in successful!");
+      console.log("Sign-in data:", data);
+    router.push('/homepage');
+     
+  
+    }
+  };
 
   return (
     <div className="animate-fadeIn card-glow relative w-full max-w-sm md:max-w-md lg:max-w-lg bg-[#F9F3CF] rounded-2xl shadow p-6">
@@ -20,16 +49,18 @@ export default function SignInCard() {
         WildCart
       </h1>
 
-      <form action="" className="pt-7 flex flex-col items-center">
-        {/* Username Input */}
+      <form onSubmit={handleSignIn} className="pt-7 flex flex-col items-center">
+        {/* Email Input */}
         <div className="relative w-full max-w-[420px]">
           <span className="absolute left-5 top-1/2 -translate-y-1/2 text-lg text-[#515050]">
             <FaUser />
           </span>
           <input
-            type="text"
-            name="username"
-            placeholder="Username"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            required
             className="inner-shadow inner-shadow2 w-full p-3 pl-13 rounded-2xl placeholder:font-medium placeholder:text-[#7F7F7F] focus:outline-none"
           />
         </div>
@@ -41,12 +72,12 @@ export default function SignInCard() {
           </span>
           <input
             type={showPassword ? "text" : "password"}
-            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
+            required
             className="inner-shadow inner-shadow2 w-full p-3 pl-13 rounded-2xl placeholder:font-medium placeholder:text-[#7F7F7F] focus:outline-none"
           />
-
-          {/* Show/Hide Password Button */}
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
@@ -56,18 +87,21 @@ export default function SignInCard() {
           </button>
         </div>
 
+        {/* Error */}
+        {error && <p className="pt-3 text-red-600">{error}</p>}
+
         {/* Login Button */}
         <div className="pt-7 relative w-full max-w-[420px] item-center">
-          <Link
-            href="/sign-in" //here ibutang ang destination url kung aha mudirect once mupislit ug sign up
+          <button
+            type="submit"
             className="block w-full cursor-pointer bg-[#F4C411] hover:bg-yellow-500 hover:scale-105 hover:shadow-[0_0_10px_#F4C411] text-white font-bold py-2 rounded-full shadow-md transition text-center"
           >
-              Login
-          </Link>
+            Login
+          </button>
         </div>
       </form>
 
-      {/* Links for Forgot Password and Sign Up */}
+      {/* Links */}
       <h3 className="text-black text-center mt-4">
         <Link
           href="/auth/forgot-password"
@@ -83,8 +117,6 @@ export default function SignInCard() {
           Sign Up
         </Link>
       </h3>
-
-      {/* Bottom Padding */}
       <div className="pt-7"></div>
     </div>
   );
