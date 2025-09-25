@@ -10,7 +10,8 @@ import supadata from "@/lib/supabaseclient";
 
 export default function SignUpCard() {
   const [gender, setGender] = useState("");
-  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [schoolID, setSchoolID] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,36 +38,49 @@ const { data, error } = await supadata.auth.signUp({
   password: password,
   options: {
     data: {
-      display_name: username
+      first_name: firstName,
+      last_name: lastName
     }
   }
 });
 
 if (error) {
-  console.log("error:", error.message);
+  if(error.message == " Database error saving new user"){
+  setErrorMsg("Signup failed: only cit emails are allowed");
+  }else{
+    console.log("error:", error.message);
+  }
 } else {
   console.log("user created:", data.user);
 }
 
-  // Insert into your `Profiles` table
+  // Insert into Profiles` table
   const user = data.user;
   if (user) {
     const { error: insertError } = await supadata.from("Profiles").insert([
       {
-        id: user.id,        
-        student_id: schoolID,   
-        fname: username,        
+        id: user.id,
+        student_id: schoolID,
+        fname: firstName,
+        lname: lastName,
         email: email,
         gender: gender,
+        login_firstime: true,
       },
     ]);
 
     if (insertError) {
       console.log("sup insert error:");
       console.log(insertError.message);
-      
     } else {
       setSuccessMsg("Registration successful!");
+      setFirstName("");
+      setLastName("");
+      setSchoolID("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setGender("");
     }
   }
 
@@ -75,26 +89,51 @@ if (error) {
 
   return (
     <div className="animate-fadeIn card-glow relative w-full max-w-sm md:max-w-md lg:max-w-lg bg-[#F9F3CF] rounded-2xl shadow p-6">
-      {/* ... logo + title ... */}
 
-      <form onSubmit={handleSignUp} className="pt-5 flex flex-col items-center">
-        {/* Username Input */}
-        <div className="relative w-full max-w-[420px]">
-          <span className="absolute left-5 top-1/2 -translate-y-1/2 text-lg text-[#515050]">
-            <FaUser />
-          </span>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-            required
-            className="inner-shadow inner-shadow2 w-full p-3 pl-13 rounded-2xl placeholder:font-medium placeholder:text-[#7F7F7F] focus:outline-none"
-          />
+      {/* Logo and WildCart title at the top (same as SignInCard) */}
+      <img
+        src="/logo.svg"
+        alt="WildCart Logo"
+        className="absolute -top-20 left-1/2 -translate-x-1/2 w-50 h-50"
+      />
+
+      <h1 className="pt-22 text-center text-4xl font-black bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-700 bg-clip-text text-transparent">
+        WildCart
+      </h1>
+
+  <form onSubmit={handleSignUp} className="pt-5 items-center">
+        {/* First Name & Last Name Side by Side */}
+  <div className="flex gap-3 w-full max-w-[420px] mb-3 mx-auto">
+          <div className="relative flex-1">
+            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-lg text-[#515050]">
+              <FaUser />
+            </span>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First Name"
+              required
+              className="inner-shadow inner-shadow2 w-full p-3 pl-13 rounded-2xl placeholder:font-medium placeholder:text-[#7F7F7F] focus:outline-none"
+            />
+          </div>
+          <div className="relative flex-1">
+            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-lg text-[#515050]">
+              <FaUser />
+            </span>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last Name"
+              required
+              className="inner-shadow inner-shadow2 w-full p-3 pl-13 rounded-2xl placeholder:font-medium placeholder:text-[#7F7F7F] focus:outline-none"
+            />
+          </div>
         </div>
 
         {/* School ID + Gender Dropdown */}
-        <div className="pt-5 w-full max-w-[420px] flex flex-wrap items-center gap-3">
+  <div className="pt-5 w-full max-w-[420px] flex flex-wrap items-center gap-3 mx-auto">
           <div className="relative flex-1 min-w-[150px] sm:min-w-[160px]">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#515050]">
               <HiIdentification size={24} />
@@ -134,7 +173,7 @@ if (error) {
         </div>
 
         {/* Email Input */}
-        <div className="pt-5 relative w-full max-w-[420px]">
+  <div className="pt-5 relative w-full max-w-[420px] mx-auto">
           <span className="pt-5 absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#515050]">
             <MdEmail size={23} />
           </span>
@@ -149,7 +188,7 @@ if (error) {
         </div>
 
         {/* Password + Confirmation */}
-        <div className="pt-5 w-full max-w-[420px] flex justify-center">
+  <div className="pt-5 w-full max-w-[420px] flex justify-center mx-auto">
           <div className="flex gap-3 w-full ">
             <div className="relative flex-1">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#515050]">
@@ -182,7 +221,7 @@ if (error) {
         </div>
 
         {/* Terms */}
-        <div className="pt-4 w-full max-w-[420px] flex items-center gap-2">
+  <div className="pt-4 w-full max-w-[420px] flex items-center gap-2 mx-auto">
           <input type="checkbox" id="terms" className="w-4 h-4 accent-yellow-500" required />
           <label htmlFor="terms" className="text-gray-700 text-sm">
             I agree to the{" "}
@@ -193,7 +232,7 @@ if (error) {
         </div>
 
         {/* Sign Up Button */}
-        <div className="pt-9 relative w-full max-w-[420px]">
+  <div className="pt-9 relative w-full max-w-[420px] mx-auto">
           <button
             type="submit"
             disabled={loading}
@@ -201,6 +240,11 @@ if (error) {
           >
             {loading ? "Signing up..." : "Sign Up"}
           </button>
+        </div>
+        {/* Already have an account? Sign In */}
+  <div className="pt-4 w-full max-w-[420px] text-center mx-auto">
+          <span className="text-gray-700 text-sm">Already have an account? </span>
+          <Link href="/auth/sign-in" className="text-yellow-600 hover:underline font-bold">Sign In</Link>
         </div>
       </form>
 
